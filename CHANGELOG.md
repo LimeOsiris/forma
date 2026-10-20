@@ -7,6 +7,7 @@ All notable changes to Forma are documented here. The format follows [Keep a Cha
 ### Added
 - README screenshots generated from the real app (`scripts/screenshots.sh`).
 - Contributor guide, issue and pull request templates.
+- MIT license.
 
 ## [1.0.0] - 2026-10-20
 

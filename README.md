@@ -13,6 +13,7 @@ A radial conversion wheel for Finder: native, private and instant.
 [![Zero dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#built-with)
 [![100% local](https://img.shields.io/badge/privacy-100%25%20on--device-0a73f5)](#privacy)
 [![Tests](https://img.shields.io/badge/tests-67%20unit%20%C2%B7%2044%20UI-2ea44f)](#testing)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [Features](#features) · [Install](#install) · [Finder integration](#finder-integration) · [Formats](#supported-formats) · [Editors](#editors) · [Docs](#documentation)
 
@@ -240,6 +241,7 @@ Tests/              Swift Testing suites with real-file fixtures
 | [Releasing](docs/RELEASE.md) | Signing, notarization, universal builds |
 | [Contributing](CONTRIBUTING.md) | Dev setup and guidelines |
 | [Changelog](CHANGELOG.md) | Release history |
+| [License](LICENSE) | MIT |
 
 ## Known limitations
 
@@ -247,6 +249,10 @@ Tests/              Swift Testing suites with real-file fixtures
 - **Word/ODT without LibreOffice** uses the macOS text engine. Headers, footers, footnotes and complex layouts may not carry over, and the app tells you so.
 - **WebP and MP3 output** need the optional tools above.
 - **Builds** from the scripts are Apple silicon only; universal builds are covered in [docs/RELEASE.md](docs/RELEASE.md).
+
+## License
+
+Forma is released under the [MIT License](LICENSE).
 
 <br>
 
