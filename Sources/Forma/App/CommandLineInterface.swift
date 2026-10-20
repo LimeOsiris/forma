@@ -12,7 +12,7 @@ import SwiftUI
 @MainActor
 enum CommandLineInterface {
     static func handles(_ args: [String]) -> Bool {
-        args.contains { ["--list", "--convert", "--snapshot-wheel", "--snapshot-editor", "--ui-test", "--help"].contains($0) }
+        args.contains { ["--list", "--convert", "--snapshot-wheel", "--snapshot-editor", "--snapshot-settings", "--ui-test", "--help"].contains($0) }
     }
 
     static func value(_ args: [String], _ flag: String) -> String? {
@@ -69,20 +69,25 @@ enum CommandLineInterface {
         }
         if let path = value(args, "--snapshot-wheel"), let out = value(args, "--out") {
             return snapshotWheel(URL(fileURLWithPath: path), to: URL(fileURLWithPath: out), dark: args.contains("--dark"),
-                                 hover: value(args, "--hover").flatMap(Int.init), phase: value(args, "--phase"))
+                                 hover: value(args, "--hover").flatMap(Int.init), phase: value(args, "--phase"), transparent: args.contains("--transparent"))
         }
         if let dir = value(args, "--ui-test") {
             return await UITestHarness(outputDirectory: URL(fileURLWithPath: dir, isDirectory: true)).run()
         }
         if let path = value(args, "--snapshot-editor"), let out = value(args, "--out") {
-            return await EditorSnapshot.render(URL(fileURLWithPath: path), to: URL(fileURLWithPath: out), dark: args.contains("--dark"))
+            let w = value(args, "--width").flatMap(Double.init) ?? 1000, h = value(args, "--height").flatMap(Double.init) ?? 700
+            return await EditorSnapshot.render(URL(fileURLWithPath: path), to: URL(fileURLWithPath: out), dark: args.contains("--dark"),
+                                               demo: args.contains("--demo"), size: NSSize(width: w, height: h))
+        }
+        if let tab = value(args, "--snapshot-settings"), let out = value(args, "--out") {
+            return await EditorSnapshot.renderSettings(tab: tab, to: URL(fileURLWithPath: out), dark: args.contains("--dark"))
         }
         return 2
     }
 
     /// Renders the real wheel view offscreen. Vibrancy needs a live window, so the
     /// frosted material is approximated with a flat fill in snapshots.
-    static func snapshotWheel(_ url: URL, to out: URL, dark: Bool, hover: Int?, phase: String?) -> Int32 {
+    static func snapshotWheel(_ url: URL, to out: URL, dark: Bool, hover: Int?, phase: String?, transparent: Bool = false) -> Int32 {
         let engine = Engine.shared
         guard let facts = try? engine.coordinator.inspect(url) else { fputs("error: unreadable file\n", stderr); return 1 }
         let settings = SettingsManager.shared
@@ -95,15 +100,20 @@ enum CommandLineInterface {
         model.hovered = hover
         switch phase {
         case "working": model.phase = .working(progress: 0.42, label: url.lastPathComponent)
-        case "done": model.phase = .done(.init(title: url.deletingPathExtension().lastPathComponent + ".pdf", detail: "Saved in \(url.deletingLastPathComponent().lastPathComponent)",
-                                               primaryURL: url, allOutputs: [url], editable: true, editability: .rasterized, notes: []))
+        case "done":
+            // Show the result of the first wheel format, so a sequence of snapshots tells one story.
+            let out = plan.primary.compactMap(\.trackedFormat).first ?? .pdf
+            let cap = engine.registry.capability(from: facts.format, to: out)
+            model.phase = .done(.init(title: url.deletingPathExtension().lastPathComponent + "." + out.preferredExtension,
+                                      detail: "Saved in \(url.deletingLastPathComponent().lastPathComponent)",
+                                      primaryURL: url, allOutputs: [url], editable: true, editability: cap?.editability, notes: []))
         case "options": if let a = plan.primary.first { model.phase = .options(a) }
         default: break
         }
         VisualEffectBackground.snapshotMode = true
         let view = RadialMenuView(model: model, actions: RadialMenuActions(select: { _ in }, dismiss: {}, cancelWork: {}, confirmOptions: {}, cancelOptions: {}, done: { _ in }))
             .environment(\.colorScheme, dark ? .dark : .light)
-            .background(dark ? Color(white: 0.16) : Color(white: 0.93))
+            .background(transparent ? Color.clear : (dark ? Color(white: 0.16) : Color(white: 0.93)))
         let host = NSHostingView(rootView: view)
         let side = model.diameter + RadialMenuView.margin * 2
         host.frame = NSRect(x: 0, y: 0, width: side, height: side)

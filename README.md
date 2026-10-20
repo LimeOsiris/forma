@@ -1,138 +1,255 @@
+<div align="center">
+
+<img src="docs/images/icon.png" width="128" alt="Forma app icon">
+
 # Forma
 
-**Convert. Edit. Done.** A native macOS utility that converts and edits files from Finder through a radial wheel that opens at your pointer. Everything runs locally: no accounts, uploads, analytics or network requests.
+**Convert. Edit. Done.**
 
-```
-Select a file in Finder → invoke Forma → pick a format on the wheel → the new file appears next to the original
-                                                                    → Open · Edit · Reveal · Done
-```
+A radial conversion wheel for Finder: native, private and instant.
+
+[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](#requirements)
+[![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)](Package.swift)
+[![Zero dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#built-with)
+[![100% local](https://img.shields.io/badge/privacy-100%25%20on--device-0a73f5)](#privacy)
+[![Tests](https://img.shields.io/badge/tests-67%20unit%20%C2%B7%2044%20UI-2ea44f)](#testing)
+
+[Features](#features) · [Install](#install) · [Finder integration](#finder-integration) · [Formats](#supported-formats) · [Editors](#editors) · [Docs](#documentation)
+
+<br>
+
+<img src="docs/images/hero.jpg" alt="Forma's radial conversion wheel">
+
+</div>
+
+<br>
+
+Converting a file on a Mac usually means opening Preview, digging through export menus, installing a single-purpose utility or uploading to a website. **Forma reduces it to two clicks.** Invoke it on a file in Finder, pick a format on the wheel, and the converted file appears next to the original. Open it, edit it or reveal it without switching apps.
+
+<div align="center">
+<img src="docs/images/flow.png" alt="Hover a format to preview its trade-offs, click to convert, then open, edit or reveal the result">
+</div>
+
+## Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### Radial wheel
+Opens at your pointer and stays on screen on every display. Hover a format to see its trade-off before converting, e.g. *"Transparent areas will become white"*. Supports the mouse, arrow keys, number keys and press-drag-release.
+
+</td>
+<td width="33%" valign="top">
+
+### Real conversion engine
+Built on ImageIO, PDFKit, TextKit, Vision and AVFoundation. Every output is re-encoded and checked by its file signature. Renaming an extension never counts as conversion.
+
+</td>
+<td width="33%" valign="top">
+
+### Built-in editors
+Crop, adjust and mark up images. Annotate, sign and reorder PDF pages. Write Markdown with a live preview. All with undo/redo, without leaving Forma.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+### Smart, stable ordering
+Defaults depend on the file: screenshots favour JPEG and PDF, PDFs lead with Edit and Text. Formats you use often earn a slot, and once on the wheel a format keeps its position for muscle memory.
+
+</td>
+<td valign="top">
+
+### Safe by design
+Never overwrites anything: if a name is taken it writes `photo 2.jpg`. Files are written atomically, a cancelled conversion leaves nothing behind, and errors are in plain language.
+
+</td>
+<td valign="top">
+
+### Batch ready
+Select many files to convert each one, or combine images and PDFs into a single PDF. Progress shows in the wheel's hub, with cancel and a report of anything skipped.
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+<img src="docs/images/wheel-light-dark.png" width="760" alt="The wheel in light and dark appearance">
+<br>
+<sub>Follows light and dark mode, Increase Contrast and Reduce Motion. Every segment is a labelled VoiceOver button.</sub>
+</div>
+
+## The wheel adapts to each file
+
+<table>
+<tr>
+<td align="center" width="33%"><img src="docs/images/wheel-docx.png" alt="Wheel for a Word document"><br><sub><b>Word document</b>: PDF, RTF, Text, HTML</sub></td>
+<td align="center" width="33%"><img src="docs/images/wheel-pdf-dark.png" alt="Wheel for a PDF"><br><sub><b>PDF</b>: Edit, Extract Text, PNG, JPEG</sub></td>
+<td align="center" width="33%"><img src="docs/images/wheel-options.png" alt="Format options card"><br><sub><b>Hold ⌥</b> for quality, size and resolution</sub></td>
+</tr>
+</table>
+
+Only conversions that actually work are offered. The wheel shows 4–8 segments, and **More** opens a second ring for the rest.
+
+## Editors
+
+Choose **Edit** on the wheel or on the confirmation card to open the right editor for the file.
+
+<img src="docs/images/editor-image.png" alt="Image editor with adjustments panel and markup">
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/editor-pdf.png" alt="PDF editor with highlight, shape and text annotations"></td>
+<td width="50%"><img src="docs/images/editor-markdown.png" alt="Markdown editor with live preview"></td>
+</tr>
+<tr>
+<td valign="top"><b>PDF</b>: page thumbnails with drag-to-reorder, rotate, delete and insert pages, highlights, notes, text boxes, shapes, drawing and signatures. Forma edits <i>annotations and pages</i>; it can't rewrite a PDF's original text, and it says so.</td>
+<td valign="top"><b>Text &amp; Markdown</b>: syntax highlighting, live preview, find &amp; replace, font size, export to PDF/HTML. RTF, Word, ODT and HTML open as rich text, with a clear notice when saving might lose formatting.</td>
+</tr>
+</table>
+
+**Images:** crop with aspect presets, rotate, flip and resize. Adjust exposure, brightness, contrast, saturation and sharpness, and add rectangle, oval, arrow, pen, highlight and text markup. Edits are non-destructive until you save, and **Save a Copy** is the default action.
 
 ## Install
 
-Requirements: macOS 14 or later, Apple silicon or Intel with a Swift 6 toolchain (Xcode **or** just the Command Line Tools).
+### Requirements
+
+- macOS 14 Sonoma or later
+- A Swift 6 toolchain: Xcode, **or just the Command Line Tools** (`xcode-select --install`)
+
+### Build and install
 
 ```bash
-scripts/build.sh
+git clone https://github.com/LimeOsiris/forma.git
 ```
 
 ```bash
-scripts/install.sh
+cd forma && scripts/build.sh && scripts/install.sh
 ```
 
-`build.sh` produces a signed `Forma.app` (ad-hoc unless you set `SIGN_IDENTITY`) in `~/Library/Caches/Forma/build`, plus a copy in `./build`. `install.sh` copies it to `~/Applications` (set `INSTALL_DIR=/Applications` to change that), registers it with Launch Services, the Services menu and pluginkit, then launches it. It changes no system or privacy settings.
+This builds a signed `Forma.app` (ad-hoc unless you set `SIGN_IDENTITY`), installs it to `~/Applications`, registers its Finder extension and Services entry, and launches it. Forma lives in your menu bar.
 
-The app is built outside the project folder on purpose. iCloud/File Provider folders, such as a synced Desktop, add Finder metadata to bundles, and codesign rejects that.
+> [!NOTE]
+> There's no notarized download yet. Pre-built binaries need a Developer ID signature, so for now build from source; it takes about two minutes. See [docs/RELEASE.md](docs/RELEASE.md).
 
-## Ways to open the wheel
+## Finder integration
 
-| Entry point | Setup | Permission | Status |
-|---|---|---|---|
-| **Right-click › Convert with Forma…** (Finder Sync extension) | Turn on *Forma* in System Settings › General › Login Items & Extensions › Finder | none | Built and registered with pluginkit; you have to switch it on yourself |
-| **⌥⌘K** (configurable) on Finder's selection | none | Automation: macOS asks once whether Forma may control Finder | Works |
-| **Right-click › Services › Open in Forma** | none | none | Registered and verified |
-| **Shift + right-click** on a Finder item | Settings › Shortcuts › Enable… | Accessibility | Implemented; needs your approval, not verified on this machine (see below) |
-| `open -a Forma file…`, drag onto the app, menu bar › Open Forma… | none | none | Works |
+macOS has no public API for replacing Finder's right-click menu, so Forma offers several supported ways in. All of them open the same wheel:
 
-All of them open the same wheel and use the same conversion engine. To set up Shift + right-click, see [docs/FINDER_INTEGRATION.md](docs/FINDER_INTEGRATION.md), which also explains its limits.
+| Entry point | Setup | Permission |
+|---|---|---|
+| **Right-click › Convert with Forma…** | Turn on *Forma* in System Settings › General › Login Items & Extensions › Finder | none |
+| **⌥⌘K** on Finder's selection (configurable) | none | macOS asks once whether Forma may control Finder |
+| **Right-click › Services › Open in Forma** | none | none |
+| **Shift + right-click** on a file (opt-in) | Settings › Shortcuts › Enable… | Accessibility |
+| Drag onto the app, `open -a Forma`, menu bar › Open Forma… | none | none |
 
-### Using the wheel
+Shift + right-click identifies **exactly** which item you clicked through the Accessibility API. If it can't be certain, Finder's normal menu appears instead. [How it works, and its limits →](docs/FINDER_INTEGRATION.md)
 
-- **Mouse:** hover to preview (the hub shows the format and any trade-off, like "Transparent areas will become white"), click to convert. You can also press, drag over a segment and release.
-- **Keyboard:** ← → (or Tab) to move, Return/Space to choose, 1–8 to pick directly, Esc to go back or dismiss.
-- **⌥ while choosing** shows options (quality, maximum size, PDF resolution).
-- **More** opens a second ring. Click outside the ring or press Esc to dismiss.
-- Quick conversions go straight to the confirmation card. Slower ones show progress in the hub (Esc cancels). If you dismiss the wheel, the conversion continues and a notification tells you when it's done.
+### Keyboard
 
-## What converts (built in, no dependencies)
+| Key | Action |
+|---|---|
+| <kbd>←</kbd> <kbd>→</kbd> / <kbd>Tab</kbd> | Move around the wheel |
+| <kbd>Return</kbd> / <kbd>Space</kbd> | Choose |
+| <kbd>1</kbd>–<kbd>8</kbd> | Choose a segment directly |
+| Hold <kbd>⌥</kbd> while choosing | Show options |
+| <kbd>Esc</kbd> | Back, cancel or dismiss |
+| <kbd>O</kbd> <kbd>E</kbd> <kbd>R</kbd> on the done card | Open · Edit · Reveal |
+
+## Supported formats
 
 | From | To |
 |---|---|
-| PNG, JPEG, HEIC, AVIF, TIFF, BMP, GIF, WebP (read), SVG | PNG, JPEG, HEIC, AVIF, TIFF, BMP, GIF, PDF |
-| PDF | PNG / JPEG / HEIC per page, multi-page TIFF, text (with on-device OCR for scans), split into single pages |
-| Several images or PDFs | one combined or merged PDF |
-| Markdown | HTML (styled, standalone), PDF, Word, RTF, ODT, text |
-| Word (DOCX/DOC), ODT, RTF, RTFD, HTML, text | PDF, Word, ODT, RTF, HTML, text, Markdown |
-| M4A, WAV, AIFF, CAF, MP3, FLAC, AAC, MOV/MP4 audio | M4A (AAC), WAV, AIFF, CAF, FLAC; MOV ⇄ MP4 rewrap |
+| **Images:** PNG, JPEG, HEIC, AVIF, TIFF, BMP, GIF, WebP¹, SVG | PNG, JPEG, HEIC, AVIF, TIFF, BMP, GIF, PDF |
+| **PDF** | PNG / JPEG / HEIC per page, multi-page TIFF, text (with on-device OCR for scans), split into pages |
+| **Several images or PDFs** | one combined / merged PDF |
+| **Markdown** | HTML (styled, standalone), PDF, Word, RTF, ODT, Text |
+| **Word (DOCX/DOC), ODT, RTF, RTFD, HTML, Text** | PDF, Word, ODT, RTF, HTML, Text, Markdown |
+| **Audio:** M4A, WAV, AIFF, CAF, MP3, FLAC, AAC, and audio from MOV/MP4 | M4A (AAC), WAV, AIFF, CAF, FLAC; MOV ⇄ MP4 rewrap |
 
-Every conversion re-encodes the file; renaming an extension never counts as conversion. Outputs are written to a scratch folder, checked by signature, and only then moved into place. Forma **never overwrites** anything: if the name is taken it writes `photo 2.jpg`, then `photo 3.jpg`, and so on.
+<sub>¹ WebP is read natively; writing it needs <code>cwebp</code>.</sub>
 
-### Optional components, detected automatically
+**Optional, detected automatically:** [LibreOffice](https://www.libreoffice.org) for high-fidelity Word → PDF, [FFmpeg](https://ffmpeg.org) for MP3 output and `cwebp` for WebP output (`brew install ffmpeg webp`). Forma runs them locally, from fixed install paths, with argument arrays only.
 
-| Tool | Adds | Licence | Install |
-|---|---|---|---|
-| LibreOffice | High-fidelity Word/ODT → PDF (preferred when present) | MPL 2.0 | libreoffice.org, into /Applications |
-| FFmpeg | MP3 output | LGPL/GPL (build dependent) | `brew install ffmpeg` |
-| cwebp | WebP output | BSD-3 | `brew install webp` |
+## Privacy
 
-Forma looks for these only at fixed install paths (it never uses a shell PATH). It runs them with separate argument arrays, never shell strings, and they run locally. **None were installed on the build machine, so these three paths are implemented but untested.**
+- **Everything happens on your Mac.** No network requests, uploads, accounts, analytics or ads.
+- Forma touches only the files you give it. It doesn't index or scan your disk.
+- It asks for Accessibility only if you turn on Shift + right-click; macOS asks for Automation the first time you use the shortcut.
+- Conversion history, used for wheel ordering, stays in `~/Library/Application Support/Forma` and can be cleared in Settings.
 
-## Editing
-
-**Edit** on the wheel or the confirmation card opens Forma's editor for the file:
-
-- **Images:** crop (with aspect presets), rotate, flip, resize, exposure, brightness, contrast, saturation, sharpness, plus rectangle, oval, arrow, pen, highlight and text markup. Edits are non-destructive with full undo/redo, and saving has quality control.
-- **PDFs:** page thumbnails with drag-to-reorder, rotate, delete, insert pages from PDFs or images, highlights, notes, text boxes, shapes, freehand drawing, signatures and undo/redo. Forma edits **annotations and pages only**. It can't rewrite a PDF's original text, and the editor says so.
-- **Text and Markdown:** syntax highlighting, live preview, find and replace, font size, undo, export to PDF/HTML.
-- **Rich text (RTF, RTFD, DOCX, ODT, DOC, HTML):** edited with the macOS text engine. Word, ODT and HTML files show a "may lose formatting" notice with **Open in Default App**, and their Save button defaults to *Save a Copy*.
-
-Overwriting the file you're editing always asks first; **Save a Copy** is the default action.
-
-## Settings
-
-The menu bar icon opens **Open Forma…**, **Convert Finder Selection**, **Recent Conversions**, **Settings…** and **Quit**. Settings are grouped into:
-
-- **General:** launch at login, save location (next to the original, ask each time, or a folder), notifications, history.
-- **Conversion:** quality, PDF resolution, OCR, ask for options, open after converting, adaptive ordering, pinned formats.
-- **Appearance:** system/light/dark, accent colour, wheel size, compact mode, animation level (Reduce Motion is honoured).
-- **Shortcuts:** shortcut recorder, Shift + right-click toggle, reset.
-- **Integrations:** live permission status, Finder extension state, optional tools.
-- **About.**
-
-**Smart ordering** starts from file-type defaults: screenshots favour JPEG, PDF and HEIC; Word files favour PDF, RTF, Text and HTML; PDFs lead with Edit and Text. Formats you use often earn a slot on the wheel, but a format keeps its position once it's there, and pinned formats always show. Usage counts are stored only in `~/Library/Application Support/Forma/history.json`.
-
-## Command line
-
-The app binary also works headless, which is handy for scripting and testing:
+## Building from source
 
 ```bash
-~/Applications/Forma.app/Contents/MacOS/Forma --list photo.png
+swift build                          # debug build of the app and engine
 ```
 
 ```bash
-~/Applications/Forma.app/Contents/MacOS/Forma --convert notes.md --to pdf --out ~/Desktop
-```
-
-## Testing
-
-```bash
-swift run FormaTestRunner
+scripts/build.sh                     # release Forma.app + Finder extension, signed
 ```
 
 ```bash
-swift build --product Forma && .build/debug/Forma --ui-test /tmp/forma-ui
+scripts/package.sh                   # zip + DMG (notarizes when given a Developer ID)
 ```
 
-- **Unit and round-trip suite:** 67 tests in 11 suites. They generate real fixtures and check output signatures, pixel values (transparency flattened to white, not black), dimensions, EXIF orientation, page counts, extracted and OCR'd text, audio duration, no-overwrite naming, path sanitising, cancellation leaving no partial files, password-protected PDFs, batch planning and wheel ordering. `swift test` runs the same suite under Xcode. With the Command Line Tools alone, SwiftPM builds Swift Testing bundles but doesn't execute them, which is why the executable runner exists.
-- **In-app UI harness:** 44 checks. It drives the real app through the Services handler and the forma:// link the Finder extension sends: the wheel opens centred on the pointer with key focus, arrow keys move around, hover works, More/Back, Esc and outside clicks dismiss, the wheel stays on screen at edges, a mouse click on a segment runs a real conversion, then the done card's **E** key opens the editor, rotate/exposure/markup with undo and redo, and Save writes a rotated file. It also covers the PDF editor (annotate, rotate, reorder, save, reload), the Markdown editor (type, save) and a three-image batch combine, in light and dark, saving a report and snapshots to the output folder.
+```bash
+scripts/screenshots.sh               # regenerate every image in this README from the real app
+```
 
-Results on the build machine (macOS 26.6, Swift 6.3.3, Command Line Tools only): **67/67 unit tests pass, and 44/44 UI checks passed in 8 consecutive runs.** Single-file conversions took 0.03 s (PNG → JPEG) and about 0.5 s (Markdown → PDF/DOCX). The built app is 4.7 MB.
+The app binary also has a command line, handy for scripting:
 
-## Privacy and security
+```bash
+Forma.app/Contents/MacOS/Forma --convert notes.md --to pdf --out ~/Desktop
+```
 
-- Forma makes no network requests, collects no telemetry and keeps no account. It doesn't index or scan your files; it touches only the files you hand it.
-- It's not sandboxed, by necessity: it writes next to your originals, sends Apple Events to Finder and optionally runs an event tap. The Finder extension **is** sandboxed.
-- It asks for Accessibility only when you click **Enable…** for Shift + right-click. Automation consent is requested by macOS on first use of the shortcut.
-- The forma:// link only ever opens the wheel; it never converts anything by itself.
-- Output names are sanitised (no `/`, `:`, control characters or leading dots), files are written atomically, and malformed files are treated as untrusted input that fails with a readable error.
+### Testing
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/FINDER_INTEGRATION.md](docs/FINDER_INTEGRATION.md) and [docs/RELEASE.md](docs/RELEASE.md).
+```bash
+swift run FormaTestRunner                                  # 67 unit & round-trip tests
+```
+
+```bash
+swift build --product Forma && .build/debug/Forma --ui-test /tmp/forma-ui   # 44 in-app UI checks
+```
+
+- **Unit and round-trip tests** generate real files and check output signatures, pixels (transparency flattened to white, not black), EXIF orientation, page counts, extracted and OCR'd text, audio duration, no-overwrite naming, cancellation and password-protected PDFs.
+- **The UI harness** drives the running app the way Finder does: open the wheel, use the keyboard and mouse, convert, open the editor, edit, undo, save. It covers the image, PDF and Markdown editors and batch combine, in light and dark mode.
+
+`swift test` runs the same suite under Xcode. With only the Command Line Tools, use `FormaTestRunner`.
+
+## Built with
+
+Only Apple frameworks, with no third-party packages: **SwiftUI** and **AppKit** for the UI, **ImageIO**, **Core Graphics** and **Core Image** for images, **PDFKit** for PDFs, **Vision** for OCR, **TextKit** for documents, **AVFoundation** for audio, and **FinderSync** for the Finder extension.
+
+```
+Sources/FormaCore   UI-free conversion engine: providers, registry, planning
+Sources/Forma       the app: wheel, editors, Finder entry points, settings
+Extensions/         sandboxed Finder Sync extension
+Tests/              Swift Testing suites with real-file fixtures
+```
+
+## Documentation
+
+| | |
+|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | Engine, wheel, editors and concurrency model |
+| [Finder integration](docs/FINDER_INTEGRATION.md) | Every macOS mechanism evaluated, setup and limits |
+| [Releasing](docs/RELEASE.md) | Signing, notarization, universal builds |
+| [Contributing](CONTRIBUTING.md) | Dev setup and guidelines |
+| [Changelog](CHANGELOG.md) | Release history |
 
 ## Known limitations
 
-- **Shift + right-click** depends on Finder's accessibility tree, which Apple doesn't document. Verifying it needs you to grant Accessibility, which wasn't possible here. When Forma can't identify the clicked item with certainty, Finder's normal menu appears instead.
-- **Ad-hoc signing** means macOS ties privacy permissions to the exact build, so after a rebuild you may need to re-grant Accessibility and Automation. Signing with a stable identity avoids that.
-- **Word/ODT without LibreOffice** goes through the macOS text engine. Headers, footers, footnotes, comments and complex layouts don't carry over, and the UI says so.
-- **WebP and MP3 output** need the optional tools above. WebP *input* is native.
-- **Animated GIFs:** converting to a single-frame format keeps the first frame, and Forma asks you to confirm before it does. GIF → GIF and GIF → TIFF/PDF keep every frame.
-- **Builds are arm64 only** from these scripts. A universal build needs Xcode, or a second build for x86_64 combined with `lipo`.
-- **No Xcode project:** Xcode wasn't installed, so the project is a Swift package. Xcode opens `Package.swift` directly for the app and tests; the Finder extension bundle is assembled by `scripts/build.sh`.
+- **Shift + right-click** relies on Finder's accessibility tree, which Apple doesn't document. It's opt-in and falls back to Finder's own menu whenever it isn't sure.
+- **Word/ODT without LibreOffice** uses the macOS text engine. Headers, footers, footnotes and complex layouts may not carry over, and the app tells you so.
+- **WebP and MP3 output** need the optional tools above.
+- **Builds** from the scripts are Apple silicon only; universal builds are covered in [docs/RELEASE.md](docs/RELEASE.md).
+
+<br>
+
+<div align="center">
+<sub>Forma is an independent project and is not affiliated with Apple. macOS and Finder are trademarks of Apple Inc.</sub>
+</div>

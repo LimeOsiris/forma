@@ -1,0 +1,38 @@
+name: Bug report
+description: Something doesn't convert, open or behave as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: conversion
+    attributes:
+      label: Conversion
+      placeholder: e.g. HEIC → JPEG, DOCX → PDF
+  - type: dropdown
+    id: entry
+    attributes:
+      label: How did you open Forma?
+      options:
+        - Finder right-click › Convert with Forma…
+        - Shortcut (⌥⌘K)
+        - Services › Open in Forma
+        - Shift + right-click
+        - Menu bar / Open With / command line
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: e.g. macOS 26.1
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Error message, screenshots, or a small non-private sample file.
