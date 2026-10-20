@@ -1,0 +1,1 @@
+../FormaCoreTests/DetectionAndRegistryTests.swift
